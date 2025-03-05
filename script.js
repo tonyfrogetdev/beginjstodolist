@@ -1,27 +1,17 @@
 const imageBtn = document.querySelectorAll(".background-selector-item");
 const todoList = document.querySelector("#list");
+const addToDoButton = document.querySelector(".add-todo");
 
-imageBtn.forEach((button) => {
-  button.addEventListener("click", () => {
-    const imageUrl = button.style.backgroundImage;
-    document.body.style.backgroundImage = imageUrl;
-  });
-});
-
-// on crée la todo maintenant
-
-// fausse donnée en attendant
-
-const fakeState = {
+const appState = {
   todos: [
     {
       id: 1,
-      text: "Lire un livre",
+      text: "Faire une douche 🚿",
       completed: false,
     },
     {
       id: 2,
-      text: "Todo BeginWeb",
+      text: "Finir BeginWeb 🕸️",
       completed: false,
     },
   ],
@@ -32,8 +22,9 @@ const renderTodos = () => {
 
   todoList.innerHTML = "";
 
-  for (const todo of fakeState.todos) {
-    createTodo(todo);
+  for (const todo of appState.todos) {
+    const todoEl = createTodo(todo);
+    todoList.appendChild(todoEl);
   }
 
   lucide.createIcons();
@@ -42,25 +33,72 @@ const renderTodos = () => {
 const createTodo = (todo) => {
   const todoEl = document.createElement("div");
   todoEl.classList.add("todo");
-
-  // Ajoute la classe "checked" si la tâche est complétée
   if (todo.completed) {
     todoEl.classList.add("checked");
   }
 
-  // Créer les éléments de la todo
-  const checkboxEl = createCheckbox(todo);
-  const { textEl, inputEl } = createEditableTextElement(todo);
-  const deleteEl = createDeleteButton(todo);
-
-  // Ajouter les éléments au todo
-  todoEl.appendChild(checkboxEl);
-  todoEl.appendChild(textEl);
-  todoEl.appendChild(inputEl);
-  todoEl.appendChild(deleteEl);
-
-  // Ajouter la todo à la liste
-  todoList.appendChild(todoEl); // Utilisation de todoList au lieu de listEl
+  const checkbox = createCheckbox(todo);
+  const text = createTextElement(todo);
+  const trashButton = createDeleteButton(todo);
+  todoEl.appendChild(checkbox);
+  todoEl.appendChild(text);
+  todoEl.appendChild(trashButton);
+  return todoEl;
 };
 
+const createCheckbox = () => {
+  const todoCheckbox = document.createElement("div");
+  const todoCheckboxCircle = document.createElement("div");
+  const todoCheckboxInput = document.createElement("input");
+  todoCheckbox.classList.add("todo-checkbox");
+  todoCheckboxCircle.classList.add("todo-checkbox-circle");
+  todoCheckboxInput.type = "checkbox";
+
+  todoCheckbox.appendChild(todoCheckboxCircle);
+  todoCheckbox.appendChild(todoCheckboxInput);
+
+  return todoCheckbox;
+};
+
+const createTextElement = (todo) => {
+  const p = document.createElement("p");
+  p.classList.add("todo-text");
+  p.textContent = todo.text;
+  return p;
+};
+
+const createDeleteButton = (todo) => {
+  const buttonEl = document.createElement("button");
+  const i = document.createElement("i");
+  buttonEl.classList.add("todo-delete");
+  i.setAttribute("data-lucide", "trash");
+  buttonEl.appendChild(i);
+  return buttonEl;
+};
 renderTodos();
+
+imageBtn.forEach((button) => {
+  button.addEventListener("click", () => {
+    const imageUrl = button.style.backgroundImage;
+    document.body.style.backgroundImage = imageUrl;
+  });
+});
+
+addToDoButton.addEventListener("click", (e) => {
+  addToDo();
+});
+
+const addToDo = () => {
+  const newId = Date.now();
+  const newTodos = [
+    ...appState.todos,
+    {
+      id: newId,
+      text: "",
+      completed: false,
+    },
+  ];
+
+  appState.todos = newTodos;
+  renderTodos();
+};
